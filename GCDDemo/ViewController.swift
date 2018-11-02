@@ -12,14 +12,14 @@
 import UIKit
 
 class ViewController: UIViewController {
-
+    
     @IBOutlet weak var imgView: UIImageView!
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
         
-        concurrentSample();
+        taskWithGroup();
     }
     
     
@@ -36,11 +36,11 @@ class ViewController: UIViewController {
             
             print("j",j);
         }
-
+        
     }
     
     func asyncSample(){
-          let queue = DispatchQueue.init(label: "async");
+        let queue = DispatchQueue.init(label: "async");
         queue.async {
             
             for i in 0..<10{
@@ -52,9 +52,9 @@ class ViewController: UIViewController {
             
             print("j",j);
         }
-
+        
     }
-
+    
     
     func qosSample(){
         
@@ -78,7 +78,7 @@ class ViewController: UIViewController {
     
     func concurrentSample(){
         
-       // let queue = DispatchQueue.init(label: "concurrent");
+        // let queue = DispatchQueue.init(label: "concurrent");
         let queue = DispatchQueue.init(label: "concurrent", qos: .default, attributes: .concurrent, autoreleaseFrequency: .workItem, target: nil);
         queue.async {
             
@@ -105,11 +105,34 @@ class ViewController: UIViewController {
         }
     }
     
+    func taskWithGroup() {
+        let dispatgGroup = DispatchGroup()
+        //one enter is match one leave
+        dispatgGroup.enter()
+        longRunningFunction { dispatgGroup.leave() }
+        dispatgGroup.enter()
+        antherFunc {
+            dispatgGroup.leave()
+        }
+        
+        dispatgGroup.notify(queue: .main) {
+            print("ok")
+        }
+    }
+    
+    func longRunningFunction(_ completeHandler: () -> Void) {
+        completeHandler()
+    }
+    
+    func antherFunc(_ completeHandler: () -> Void) {
+        // completeHandler()
+    }
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
-
+    
+    
 }
 
